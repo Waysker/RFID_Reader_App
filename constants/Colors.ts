@@ -16,4 +16,6 @@ export default {
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorDark,
   },
+  aghRed: '#a71931',
+  aghGreen: '#00693c',
 };

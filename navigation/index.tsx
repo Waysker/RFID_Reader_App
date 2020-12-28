@@ -1,34 +1,51 @@
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import * as React from 'react';
-import { ColorSchemeName } from 'react-native';
-
-import NotFoundScreen from '../screens/NotFoundScreen';
-import { RootStackParamList } from '../types';
-import BottomTabNavigator from './BottomTabNavigator';
-import LinkingConfiguration from './LinkingConfiguration';
-
-// If you are not familiar with React Navigation, we recommend going through the
-// "Fundamentals" guide: https://reactnavigation.org/docs/getting-started
-export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
-  return (
-    <NavigationContainer
-      linking={LinkingConfiguration}
-      theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <RootNavigator />
-    </NavigationContainer>
-  );
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer} from '@react-navigation/native'
+import * as React from 'react'
+import UserList from "../screens/UserList"
+import UserEntriesList from "../screens/UserEntriesList"
+import '../constants/Endpoints.ts'
+import { TextInput, View } from "react-native";
+interface Item {
+  firstName: string;
+  lastName: string;
+  csn: string;
 }
+export type AppStackParamList = {
+  UserList: undefined;
+  UserEntriesList: { User: Item };
+};
 
-// A root stack navigator is often used for displaying modals on top of all other content
-// Read more here: https://reactnavigation.org/docs/modal
-const Stack = createStackNavigator<RootStackParamList>();
+const HomeStack = createStackNavigator<AppStackParamList>();
 
-function RootNavigator() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Root" component={BottomTabNavigator} />
-      <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
-    </Stack.Navigator>
-  );
-}
+
+export const AppNavigator = () =>{
+
+const [value, onChangeText] = React.useState(global.ip);
+return(
+  <NavigationContainer>
+    <HomeStack.Navigator>
+      <HomeStack.Screen 
+      name="UserList" 
+      component={UserList}
+      options={
+        {title: global.ip,
+        headerTitle: () => <View>
+        <TextInput 
+        onChangeText={text => onChangeText(text)}
+        onEndEditing={() => global.ip=value}
+        value={value}/>
+        </View>,
+        headerStyle:{
+          backgroundColor: '#197aa7'
+        },
+        }}/>
+      <HomeStack.Screen 
+      name="UserEntriesList" 
+      component={UserEntriesList}
+      options={({route}) => ({title: route.params.User.firstName+" " +route.params.User.lastName,
+      headerStyle:{
+        backgroundColor: '#197aa7'
+      }})}/>
+    </HomeStack.Navigator>
+  </NavigationContainer>
+)}
